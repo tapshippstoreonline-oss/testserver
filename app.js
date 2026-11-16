@@ -136,17 +136,96 @@ function addToCart(id,qty=1){
   if(item)item.qty=Math.min(item.qty+qty,p.stock);else cart.push({id,qty:Math.min(qty,p.stock)});
   saveCart(cart);alert("Added to your TAPSHIPP cart.");
 }
+
 function renderHome(){
-  const categories=[...new Set(products.map(p=>p.category).filter(Boolean))];
-  const categoryList=$("#categoryList");
-  if(categoryList)categoryList.innerHTML=`<button class="category-chip ${activeCategory==="all"?"active":""}" data-category="all">All products</button>`+categories.map(c=>`<button class="category-chip ${activeCategory===c?"active":""}" data-category="${safe(c)}">${safe(c)}</button>`).join("");
-  categoryList?.querySelectorAll("[data-category]").forEach(b=>b.addEventListener("click",()=>{activeCategory=b.dataset.category;renderHome();}));
-  const sort=$("#sortSelect")?.value||"featured";
-  let shown=products.filter(p=>(activeCategory==="all"||p.category===activeCategory)&&(`${p.name} ${p.brand} ${p.category}`.toLowerCase().includes(searchTerm)));
-  if(sort==="price-low")shown.sort((a,b)=>a.price-b.price);if(sort==="price-high")shown.sort((a,b)=>b.price-a.price);if(sort==="name")shown.sort((a,b)=>a.name.localeCompare(b.name));
-  const grid=$("#productGrid");if(grid){grid.innerHTML=shown.map(cardHTML).join("")||"";bindAddButtons(grid);}
-  $("#resultSummary") && ($("#resultSummary").textContent=`Showing ${shown.length} of ${products.length} products`);
-  $("#emptyState")?.classList.toggle("hidden",shown.length!==0);
+
+  const categories = [...new Set(
+    products
+      .map(p => String(p.category || "").trim())
+      .filter(Boolean)
+  )].sort((a,b) =>
+    a.localeCompare(b,"en",{sensitivity:"base"})
+  );
+
+  const categoryList = $("#categoryList");
+
+  if(categoryList){
+
+    categoryList.innerHTML =
+      `<button class="category-chip ${activeCategory==="all"?"active":""}"
+      data-category="all" type="button">All products</button>` +
+
+      categories.map(c =>
+        `<button class="category-chip ${activeCategory===c?"active":""}"
+        data-category="${safe(c)}" type="button">${safe(c)}</button>`
+      ).join("");
+
+    categoryList.querySelectorAll("[data-category]").forEach(button => {
+
+      button.addEventListener("click",()=>{
+
+        activeCategory = button.dataset.category;
+
+        const dropdown = $("#categoryDropdown");
+
+        if(dropdown) dropdown.open = false;
+
+        renderHome();
+
+        if(activeCategory !== "all"){
+          $("#products")?.scrollIntoView({
+            behavior:"smooth",
+            block:"start"
+          });
+        }
+
+      });
+
+    });
+
+  }
+
+  const sort = $("#sortSelect")?.value || "featured";
+
+  let shown = products.filter(p =>
+    (activeCategory === "all" || p.category === activeCategory) &&
+    (`${p.name} ${p.brand} ${p.category}`
+      .toLowerCase().includes(searchTerm))
+  );
+
+  if(sort === "price-low"){
+    shown.sort((a,b)=>a.price-b.price);
+  }
+
+  if(sort === "price-high"){
+    shown.sort((a,b)=>b.price-a.price);
+  }
+
+  if(sort === "name"){
+    shown.sort((a,b)=>a.name.localeCompare(b.name));
+  }
+
+  const grid = $("#productGrid");
+
+  if(grid){
+    grid.innerHTML = shown.map(cardHTML).join("") || "";
+    bindAddButtons(grid);
+  }
+
+  const summary = $("#resultSummary");
+
+  if(summary){
+    summary.textContent =
+      `Showing ${shown.length} of ${products.length} products`;
+  }
+
+  $("#emptyState")?.classList.toggle(
+    "hidden",
+    shown.length !== 0
+  );
+
+}
+
 }
 function setupHome(){
   const form=$("#searchForm"),input=$("#searchInput");
