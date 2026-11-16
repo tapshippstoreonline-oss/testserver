@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#102b4e">
+  <title>TAPSHIPP | Shop Online</title>
+  <meta name="description" content="Discover useful products and shop online with TAPSHIPP.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://script.google.com">
+  <link rel="preconnect" href="https://script.googleusercontent.com">
+  <script defer src="app.js"></script>
+</head>
+<body data-page="home">
+  <div class="announcement">WELCOME TO TAPSHIPP <span>•</span> Shop smart. Live better.</div>
+
+  <header class="site-header">
+    <a class="brand" href="index.html" aria-label="TAPSHIPP home">
+      <img class="brand-mark" src="tapshipp-logo.png" alt="TAPSHIPP logo">
+      <span>TAPSHIPP<small>SHOP SMART. LIVE BETTER.</small></span>
+    </a>
+    <form class="header-search" id="searchForm" role="search">
+      <input id="searchInput" type="search" placeholder="Search products..." aria-label="Search products">
+      <button type="submit" aria-label="Search">⌕</button>
+    </form>
+    <nav class="header-actions" aria-label="Main navigation">
+      <a class="cart-link" href="checkout.html"><span class="cart-icon" aria-hidden="true">🛒</span> Cart <span id="cartCount" class="count">0</span></a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-copy">
+        <span class="eyebrow">THE TAPSHIPP STORE</span>
+        <h1>Good finds.<br><em>Great everyday value.</em></h1>
+        <p>Discover useful products, explore new favourites and enjoy a simple shopping experience.</p>
+        <a class="btn btn-light" href="#products">Shop products <span aria-hidden="true">→</span></a>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <div class="hero-circle"></div>
+        <div class="hero-card"><span>JUST IN</span><strong>SHOP<br>SMART.</strong><small>GOOD FINDS, ONE CLICK AWAY</small></div>
+      </div>
+    </section>
+
+    <section class="section category-section" id="categories">
+      <div class="section-heading">
+        <div><span class="eyebrow">FIND WHAT YOU NEED</span><h2>Shop by category</h2><p class="muted">Browse our collection by category.</p></div>
+      </div>
+
+      <details class="category-dropdown" id="categoryDropdown">
+        <summary class="category-dropdown-trigger">
+          <span><span class="category-trigger-icon" aria-hidden="true">☷</span> Category List</span>
+          <span class="category-trigger-right"><small>Browse categories</small><span class="category-chevron" aria-hidden="true">⌄</span></span>
+        </summary>
+        <div class="category-dropdown-panel">
+          <div class="category-panel-heading">ALL CATEGORIES <span>A–Z</span></div>
+          <div id="categoryList" class="category-list">
+            <button class="category-chip active" data-category="all" type="button">All products</button>
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <section class="section products-section" id="products">
+      <div class="section-heading product-heading">
+        <div><span class="eyebrow">THE LATEST FINDS</span><h2>Explore products</h2><p class="muted" id="resultSummary">Discover the latest products in our store.</p></div>
+        <label class="sort-wrap"><span>Sort by</span>
+          <select id="sortSelect" class="sort-select" aria-label="Sort products">
+            <option value="featured">Featured</option>
+            <option value="price-low">Price: low to high</option>
+            <option value="price-high">Price: high to low</option>
+            <option value="name">Name: A to Z</option>
+          </select>
+        </label>
+      </div>
+      <div id="productGrid" class="product-grid"><div class="loading">Loading products...</div></div>
+      <div id="emptyState" class="empty-state hidden"><strong>No products found</strong><p>Try another search or category.</p><button class="btn btn-outline" id="clearFilters" type="button">Clear filters</button></div>
+    </section>
+
+    <section class="trust-strip">
+      <div><b>✓</b><span><strong>Easy ordering</strong><small>A simple checkout process</small></span></div>
+      <div><b>◇</b><span><strong>Clear product details</strong><small>Know what you're buying</small></span></div>
+      <div><b>↗</b><span><strong>Order support</strong><small>We're here to help</small></span></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <a class="brand footer-brand" href="index.html">
+      <img class="brand-mark" src="tapshipp-logo.png" alt="TAPSHIPP logo">
+      <span>TAPSHIPP<small>SHOP SMART. LIVE BETTER.</small></span>
+    </a>
+    <p>© <span id="year"></span> TAPSHIPP. All rights reserved.</p>
+    <div>
+      <a href="https://docs.google.com/forms/d/e/1FAIpQLSd2cRMRgKp8Gcm7FqmXLo8nlB10rvt4RDgjiMleQ8uYyAydCQ/viewform?usp=dialog" target="_blank" rel="noopener noreferrer">Help Desk</a>
+      <a href="store-information.html">Store information</a>
+    </div>
+  </footer>
+
+  <a class="mobile-cart-bar" href="checkout.html"><span>View cart</span><span>🛒 <b id="mobileCartCount">0</b></span></a>
+  <script>
+    // Keep the optional mobile cart count in sync with the existing app.js cart counter.
+    document.addEventListener("DOMContentLoaded", function () {
+      const mainCount = document.getElementById("cartCount");
+      const mobileCount = document.getElementById("mobileCartCount");
+      if (!mainCount || !mobileCount) return;
+      const sync = () => mobileCount.textContent = mainCount.textContent;
+      sync();
+      new MutationObserver(sync).observe(mainCount, {childList:true, characterData:true, subtree:true});
+    });
+  </script>
+</body>
+</html>
