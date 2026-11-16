@@ -136,40 +136,95 @@ function addToCart(id,qty=1){
   if(item)item.qty=Math.min(item.qty+qty,p.stock);else cart.push({id,qty:Math.min(qty,p.stock)});
   saveCart(cart);alert("Added to your TAPSHIPP cart.");
 }
+
 function renderHome(){
-  // Build unique category names from the live product catalogue and sort A–Z.
-  const categories=[...new Set(products.map(p=>String(p.category||"").trim()).filter(Boolean))]
-    .sort((a,b)=>a.localeCompare(b,undefined,{sensitivity:"base",numeric:true}));
 
-  const categoryList=$("#categoryList");
+  const categories = [...new Set(
+    products
+      .map(p => String(p.category || "").trim())
+      .filter(Boolean)
+  )].sort((a,b) =>
+    a.localeCompare(b,"en",{sensitivity:"base"})
+  );
+
+  const categoryList = $("#categoryList");
+
   if(categoryList){
-    const selectedLabel=activeCategory==="all"?"All products":activeCategory;
-    const options=[{value:"all",label:"All products"},...categories.map(c=>({value:c,label:c}))];
-    categoryList.innerHTML=`
-      <button type="button" class="category-dropdown-toggle" id="categoryDropdownToggle"
-        aria-expanded="${categoryDropdownOpen?"true":"false"}" aria-controls="categoryDropdownMenu">
-        <span>Category List: ${safe(selectedLabel)}</span><span class="category-dropdown-chevron" aria-hidden="true">▼</span>
-      </button>
-      <div class="category-dropdown-menu" id="categoryDropdownMenu" ${categoryDropdownOpen?"":"hidden"}>
-        ${options.map(item=>`<button type="button" class="category-dropdown-option ${activeCategory===item.value?"active":""}" data-category="${safe(item.value)}" ${activeCategory===item.value?'aria-current="true"':""}>${safe(item.label)}</button>`).join("")}
-      </div>`;
 
-    const toggle=$("#categoryDropdownToggle",categoryList);
-    toggle?.addEventListener("click",()=>{
-      categoryDropdownOpen=!categoryDropdownOpen;
-      const menu=$("#categoryDropdownMenu",categoryList);
-      toggle.setAttribute("aria-expanded",String(categoryDropdownOpen));
-      if(menu)menu.hidden=!categoryDropdownOpen;
-    });
+    categoryList.innerHTML =
+      `<button class="category-chip ${activeCategory==="all"?"active":""}"
+      data-category="all" type="button">All products</button>` +
 
-    categoryList.querySelectorAll("[data-category]").forEach(button=>{
+      categories.map(c =>
+        `<button class="category-chip ${activeCategory===c?"active":""}"
+        data-category="${safe(c)}" type="button">${safe(c)}</button>`
+      ).join("");
+
+    categoryList.querySelectorAll("[data-category]").forEach(button => {
+
       button.addEventListener("click",()=>{
-        activeCategory=button.dataset.category;
-        categoryDropdownOpen=false;
+
+        activeCategory = button.dataset.category;
+
+        const dropdown = $("#categoryDropdown");
+
+        if(dropdown) dropdown.open = false;
+
         renderHome();
+
+        if(activeCategory !== "all"){
+          $("#products")?.scrollIntoView({
+            behavior:"smooth",
+            block:"start"
+          });
+        }
+
       });
+
     });
+
   }
+
+  const sort = $("#sortSelect")?.value || "featured";
+
+  let shown = products.filter(p =>
+    (activeCategory === "all" || p.category === activeCategory) &&
+    (`${p.name} ${p.brand} ${p.category}`
+      .toLowerCase().includes(searchTerm))
+  );
+
+  if(sort === "price-low"){
+    shown.sort((a,b)=>a.price-b.price);
+  }
+
+  if(sort === "price-high"){
+    shown.sort((a,b)=>b.price-a.price);
+  }
+
+  if(sort === "name"){
+    shown.sort((a,b)=>a.name.localeCompare(b.name));
+  }
+
+  const grid = $("#productGrid");
+
+  if(grid){
+    grid.innerHTML = shown.map(cardHTML).join("") || "";
+    bindAddButtons(grid);
+  }
+
+  const summary = $("#resultSummary");
+
+  if(summary){
+    summary.textContent =
+      `Showing ${shown.length} of ${products.length} products`;
+  }
+
+  $("#emptyState")?.classList.toggle(
+    "hidden",
+    shown.length !== 0
+  );
+
+}
 
   const sort=$("#sortSelect")?.value||"featured";
   let shown=products.filter(p=>(activeCategory==="all"||String(p.category||"").trim()===activeCategory)&&(`${p.name} ${p.brand} ${p.category}`.toLowerCase().includes(searchTerm)));
