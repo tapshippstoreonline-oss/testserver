@@ -1,2 +1,0 @@
-# testserver
-the test server,
